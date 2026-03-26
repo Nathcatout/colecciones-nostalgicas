@@ -35,6 +35,10 @@ class ColeccionService:
         self.colecciones[nombre] = []
 
     def eliminar_categoria(self, categoria):
+
+        if categoria not in self.colecciones:
+            raise ValueError("La categoría no existe")
+
         del self.colecciones[categoria]
 
     def obtener_categorias(self):
@@ -42,15 +46,25 @@ class ColeccionService:
 
     def agregar_elemento(self, categoria, nombre, anio, estado):
 
+        if categoria not in self.colecciones:
+            raise ValueError("La categoría no existe")
+
         if not anio.isdigit():
             raise ValueError("El año debe ser numérico")
 
         self.colecciones[categoria].append(Elemento(nombre, anio, estado))
 
     def obtener_elementos(self, categoria):
+
+        if categoria not in self.colecciones:
+            raise ValueError("La categoría no existe")
+
         return self.colecciones[categoria]
 
     def editar_elemento(self, categoria, indice, nombre, anio, estado):
+
+        if categoria not in self.colecciones:
+            raise ValueError("La categoría no existe")
 
         if not anio.isdigit():
             raise ValueError("El año debe ser numérico")
@@ -58,9 +72,17 @@ class ColeccionService:
         self.colecciones[categoria][indice] = Elemento(nombre, anio, estado)
 
     def eliminar_elemento(self, categoria, indice):
+
+        if categoria not in self.colecciones:
+            raise ValueError("La categoría no existe")
+
         del self.colecciones[categoria][indice]
 
     def contar_elementos(self, categoria):
+
+        if categoria not in self.colecciones:
+            raise ValueError("La categoría no existe")
+
         return len(self.colecciones[categoria])
 
     def buscar_elemento(self, nombre):
@@ -90,15 +112,16 @@ class App:
         self.service = ColeccionService()
         self.indice = None
 
-        titulo = tk.Label(root,
-                          text="Gestión de Colecciones Nostálgicas",
-                          font=("Arial", 16, "bold"))
+        titulo = tk.Label(
+            root,
+            text="Gestión de Colecciones Nostálgicas",
+            font=("Arial", 16, "bold")
+        )
         titulo.pack(pady=10)
 
         main = tk.Frame(root)
         main.pack(padx=10, pady=10)
 
-        # COLUMNAS
         left = tk.Frame(main)
         left.grid(row=0, column=0, padx=10)
 
@@ -175,7 +198,7 @@ class App:
         tk.Button(frame_add, text="Guardar cambios", command=self.editar).grid(row=4, column=1)
 
         # -----------------------------
-        # BUSCAR + CONTAR
+        # BUSCAR / CONTAR
         # -----------------------------
 
         frame_buscar = tk.LabelFrame(right, text="Buscar / Contar", padx=10, pady=10)
@@ -195,7 +218,8 @@ class App:
     def crear_categoria(self):
 
         try:
-            nombre = self.entry_categoria.get()
+            nombre = self.entry_categoria.get().strip()
+
             self.service.crear_categoria(nombre)
 
             self.entry_categoria.delete(0, tk.END)
@@ -210,13 +234,17 @@ class App:
         seleccion = self.lista_categorias.curselection()
 
         if not seleccion:
+            messagebox.showerror("Error", "Seleccione una categoría")
             return
 
         categoria = self.lista_categorias.get(seleccion)
 
         if messagebox.askyesno("Confirmar", "¿Eliminar categoría?"):
-            self.service.eliminar_categoria(categoria)
-            self.actualizar_lista()
+            try:
+                self.service.eliminar_categoria(categoria)
+                self.actualizar_lista()
+            except ValueError as e:
+                messagebox.showerror("Error", str(e))
 
     def actualizar_lista(self):
 
@@ -245,9 +273,9 @@ class App:
         try:
 
             self.service.agregar_elemento(
-                self.cat.get(),
-                self.nombre.get(),
-                self.anio.get(),
+                self.cat.get().strip(),
+                self.nombre.get().strip(),
+                self.anio.get().strip(),
                 self.estado.get()
             )
 
@@ -261,20 +289,30 @@ class App:
 
     def ver(self):
 
-        categoria = self.cat_ver.get()
+        try:
 
-        elementos = self.service.obtener_elementos(categoria)
+            categoria = self.cat_ver.get().strip()
 
-        self.lista.delete(0, tk.END)
+            elementos = self.service.obtener_elementos(categoria)
 
-        for e in elementos:
-            self.lista.insert(tk.END, f"{e.nombre} | {e.anio} | {e.estado}")
+            self.lista.delete(0, tk.END)
+
+            if not elementos:
+                messagebox.showinfo("Información", "No hay elementos en esta categoría")
+                return
+
+            for e in elementos:
+                self.lista.insert(tk.END, f"{e.nombre} | {e.anio} | {e.estado}")
+
+        except ValueError as e:
+            messagebox.showerror("Error", str(e))
 
     def cargar(self):
 
         seleccion = self.lista.curselection()
 
         if not seleccion:
+            messagebox.showerror("Error", "Seleccione un elemento")
             return
 
         indice = seleccion[0]
@@ -295,21 +333,29 @@ class App:
 
     def editar(self):
 
-        self.service.editar_elemento(
-            self.cat.get(),
-            self.indice,
-            self.nombre.get(),
-            self.anio.get(),
-            self.estado.get()
-        )
+        try:
 
-        self.ver()
+            self.service.editar_elemento(
+                self.cat.get().strip(),
+                self.indice,
+                self.nombre.get().strip(),
+                self.anio.get().strip(),
+                self.estado.get()
+            )
+
+            messagebox.showinfo("Éxito", "Elemento actualizado")
+
+            self.ver()
+
+        except ValueError as e:
+            messagebox.showerror("Error", str(e))
 
     def eliminar_elemento(self):
 
         seleccion = self.lista.curselection()
 
         if not seleccion:
+            messagebox.showerror("Error", "Seleccione un elemento")
             return
 
         indice = seleccion[0]
@@ -317,27 +363,44 @@ class App:
         categoria = self.cat_ver.get()
 
         if messagebox.askyesno("Confirmar", "¿Eliminar elemento?"):
-            self.service.eliminar_elemento(categoria, indice)
-            self.ver()
+
+            try:
+                self.service.eliminar_elemento(categoria, indice)
+                self.ver()
+            except ValueError as e:
+                messagebox.showerror("Error", str(e))
 
     def buscar(self):
 
-        nombre = self.buscar_nombre.get()
+        nombre = self.buscar_nombre.get().strip()
+
+        if not nombre:
+            messagebox.showerror("Error", "Ingrese un nombre para buscar")
+            return
 
         resultados = self.service.buscar_elemento(nombre)
 
         self.lista.delete(0, tk.END)
+
+        if not resultados:
+            messagebox.showerror("Error", "El elemento no existe")
+            return
 
         for categoria, e in resultados:
             self.lista.insert(tk.END, f"{categoria} -> {e.nombre} | {e.anio} | {e.estado}")
 
     def contar(self):
 
-        categoria = self.cat_ver.get()
+        try:
 
-        cantidad = self.service.contar_elementos(categoria)
+            categoria = self.cat_ver.get().strip()
 
-        messagebox.showinfo("Cantidad", f"{cantidad} elementos")
+            cantidad = self.service.contar_elementos(categoria)
+
+            messagebox.showinfo("Cantidad", f"{cantidad} elementos")
+
+        except ValueError as e:
+            messagebox.showerror("Error", str(e))
 
 
 root = tk.Tk()
