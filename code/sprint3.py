@@ -278,7 +278,7 @@ class App:
         tk.Button(frame_add, text="Agregar", command=self.agregar).grid(row=4, column=0)
         tk.Button(frame_add, text="Guardar cambios", command=self.editar).grid(row=4, column=1)
 
-        # -----------------------------
+       # -----------------------------
         # BUSCAR / CONTAR
         # -----------------------------
 
@@ -297,6 +297,9 @@ class App:
     # -----------------------------
 
     def crear_categoria(self):
+        """
+        Creates a new category in the system.
+        """
 
         try:
             nombre = self.entry_categoria.get().strip()
@@ -311,6 +314,9 @@ class App:
             messagebox.showerror("Error", str(e))
 
     def eliminar_categoria(self):
+        """
+        Deletes the selected category from the system.
+        """
 
         seleccion = self.lista_categorias.curselection()
 
@@ -328,6 +334,9 @@ class App:
                 messagebox.showerror("Error", str(e))
 
     def actualizar_lista(self):
+        """
+        Updates the category list displayed in the interface.
+        """
 
         self.lista_categorias.delete(0, tk.END)
 
@@ -335,6 +344,11 @@ class App:
             self.lista_categorias.insert(tk.END, cat)
 
     def seleccionar_categoria(self, event):
+        """
+        Handles the event when a category is selected from the list.
+
+        :param event: Tkinter event triggered by the list selection
+        """
 
         seleccion = self.lista_categorias.curselection()
 
@@ -350,6 +364,9 @@ class App:
         self.cat_ver.insert(0, categoria)
 
     def agregar(self):
+        """
+        Adds a new element to the selected category.
+        """
 
         try:
 
@@ -369,6 +386,9 @@ class App:
             messagebox.showerror("Error", str(e))
 
     def ver(self):
+        """
+        Displays the elements of the selected category in the list.
+        """
 
         try:
 
@@ -389,6 +409,9 @@ class App:
             messagebox.showerror("Error", str(e))
 
     def cargar(self):
+        """
+        Loads the selected element into the edit fields.
+        """
 
         seleccion = self.lista.curselection()
 
@@ -413,6 +436,9 @@ class App:
         self.estado.set(elemento.estado)
 
     def editar(self):
+        """
+        Updates the selected element with the new information.
+        """
 
         try:
 
@@ -432,6 +458,9 @@ class App:
             messagebox.showerror("Error", str(e))
 
     def eliminar_elemento(self):
+        """
+        Deletes the selected element from the category.
+        """
 
         seleccion = self.lista.curselection()
 
@@ -452,6 +481,9 @@ class App:
                 messagebox.showerror("Error", str(e))
 
     def buscar(self):
+        """
+        Searches for elements by name across all categories.
+        """
 
         nombre = self.buscar_nombre.get().strip()
 
@@ -471,6 +503,9 @@ class App:
             self.lista.insert(tk.END, f"{categoria} -> {e.nombre} | {e.anio} | {e.estado}")
 
     def contar(self):
+        """
+        Counts the elements stored in the selected category.
+        """
 
         try:
 
