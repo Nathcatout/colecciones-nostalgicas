@@ -10,6 +10,10 @@ from tkinter import ttk
 
 @dataclass
 class Elemento:
+    """
+    Represents an element stored in a collection.
+    """
+
     nombre: str
     anio: str
     estado: str
@@ -20,11 +24,23 @@ class Elemento:
 # -----------------------------
 
 class ColeccionService:
+    """
+    Handles the business logic for managing collections and their elements.
+    """
 
     def __init__(self):
+        """
+        Initializes the collection service with an empty dictionary.
+        """
         self.colecciones = {}
 
     def crear_categoria(self, nombre):
+        """
+        Creates a new category.
+
+        :param nombre: Name of the category
+        :raises ValueError: If the name is empty or the category already exists
+        """
 
         if not nombre:
             raise ValueError("Ingrese un nombre")
@@ -35,6 +51,12 @@ class ColeccionService:
         self.colecciones[nombre] = []
 
     def eliminar_categoria(self, categoria):
+        """
+        Deletes an existing category.
+
+        :param categoria: Name of the category to delete
+        :raises ValueError: If the category does not exist
+        """
 
         if categoria not in self.colecciones:
             raise ValueError("La categoría no existe")
@@ -42,9 +64,23 @@ class ColeccionService:
         del self.colecciones[categoria]
 
     def obtener_categorias(self):
+        """
+        Returns all existing categories.
+
+        :return: List of category names
+        """
         return list(self.colecciones.keys())
 
     def agregar_elemento(self, categoria, nombre, anio, estado):
+        """
+        Adds a new element to a category.
+
+        :param categoria: Category where the element will be added
+        :param nombre: Name of the element
+        :param anio: Year of the element
+        :param estado: Condition of the element
+        :raises ValueError: If the category does not exist or the year is not numeric
+        """
 
         if categoria not in self.colecciones:
             raise ValueError("La categoría no existe")
@@ -55,6 +91,13 @@ class ColeccionService:
         self.colecciones[categoria].append(Elemento(nombre, anio, estado))
 
     def obtener_elementos(self, categoria):
+        """
+        Returns all elements of a category.
+
+        :param categoria: Category to retrieve elements from
+        :return: List of elements in the category
+        :raises ValueError: If the category does not exist
+        """
 
         if categoria not in self.colecciones:
             raise ValueError("La categoría no existe")
@@ -62,6 +105,16 @@ class ColeccionService:
         return self.colecciones[categoria]
 
     def editar_elemento(self, categoria, indice, nombre, anio, estado):
+        """
+        Updates an existing element.
+
+        :param categoria: Category of the element
+        :param indice: Position of the element in the list
+        :param nombre: New name of the element
+        :param anio: New year of the element
+        :param estado: New condition of the element
+        :raises ValueError: If the category does not exist or the year is not numeric
+        """
 
         if categoria not in self.colecciones:
             raise ValueError("La categoría no existe")
@@ -72,6 +125,13 @@ class ColeccionService:
         self.colecciones[categoria][indice] = Elemento(nombre, anio, estado)
 
     def eliminar_elemento(self, categoria, indice):
+        """
+        Deletes an element from a category.
+
+        :param categoria: Category of the element
+        :param indice: Index of the element in the list
+        :raises ValueError: If the category does not exist
+        """
 
         if categoria not in self.colecciones:
             raise ValueError("La categoría no existe")
@@ -79,6 +139,13 @@ class ColeccionService:
         del self.colecciones[categoria][indice]
 
     def contar_elementos(self, categoria):
+        """
+        Counts the number of elements in a category.
+
+        :param categoria: Category to count elements from
+        :return: Number of elements in the category
+        :raises ValueError: If the category does not exist
+        """
 
         if categoria not in self.colecciones:
             raise ValueError("La categoría no existe")
@@ -86,6 +153,12 @@ class ColeccionService:
         return len(self.colecciones[categoria])
 
     def buscar_elemento(self, nombre):
+        """
+        Searches for elements by name across all categories.
+
+        :param nombre: Name or partial name of the element to search
+        :return: List of tuples containing the category and the matching element
+        """
 
         resultados = []
 
@@ -102,8 +175,16 @@ class ColeccionService:
 # -----------------------------
 
 class App:
+    """
+    Graphical user interface for managing nostalgic collections.
+    """
 
     def __init__(self, root):
+        """
+        Initializes the application interface.
+
+        :param root: Main Tkinter window
+        """
 
         self.root = root
         self.root.title("NostalgiaHub - Sprint 3")
